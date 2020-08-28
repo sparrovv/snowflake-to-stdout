@@ -52,15 +52,12 @@ case class StreamUnloader(config: Config, snowflake: SnowflakeConnector) extends
             .fromInputStream(stream)
             .getLines()
             .foreach(println)
-//            .grouped(batchSize)
-//            .foreach(line => {
-//            })
         })
     }
   }
 
   private def cleanUnloadFiles(stagePath: String) = {
-    logger.info(s"Clearning files for $stagePath}")
+    logger.info(s"Cleaning files for $stagePath}")
 
     Try(snowflake.performQuery(s"""remove @$stagePath""")(_ => "")) match {
       case Success(_) =>
