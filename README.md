@@ -6,10 +6,10 @@ Snowflake to STDOUT (in JSON).
 
 I needed something that will stream results to SDOUT in JSON
 
-## What it supports:
+## What it supports
 
 - streaming from the JDBC result set
-- streaming from the internal Snowflake stage
+- streaming from the internal named stage
 
 ## Required
 
@@ -24,31 +24,51 @@ create or replace stage test_stage
   file_format = (type = 'JSON' );
 ```
 
-## How
+https://docs.snowflake.com/en/user-guide/data-unload-snowflake.html
 
-- unload to internal snowflake stage in JSON format
-- stream to stdout
+## How to ?
 
-## How to 
+### Simple
 
-java -jar ...\
-    --use-result-set \
-    --sql "SELECT object_construct(*)::varchar FROM big_table order by updated_at" 
+Stream results of the basic query:
 
-Unload, stream, but don't delete the files:
+```bash
+./target/jars/snowflake-to-stdout \
+  --sql "SELECT object_construct(*)::varchar FROM big_table order by updated_at" 
+```
 
-java -jar ...\
+
+### Use internal snowflake stages
+
+You need to create one before! 
+
+copy to stage and stream:
+
+```bash
+./target/jars/snowflake-to-stdout \
+    --stage test_stage \
+    --prefix "foo/bar1/" \
+    --sql "SELECT object_construct(*) FROM big_table order_by updated_at" 
+```
+
+Don't delete files from the stage 
+
+```bash
+./target/jars/snowflake-to-stdout \
     --stage test_stage \
     --prefix "foo/bar1/" \
     --sql "SELECT object_construct(*) FROM big_table order_by updated_at" 
     --keep
+```
 
 Stream existing json files, don't delete
 
-java -jar ...\
+```bash
+./target/jars/snowflake-to-stdout \
     --stage test_stage \
-    --prefix "foo/bar1/"
+    --prefix "foo/bar1/" \
     --keep
+```
 
 ## Extra info
 
